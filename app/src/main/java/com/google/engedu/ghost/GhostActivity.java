@@ -42,8 +42,7 @@ public class GhostActivity extends AppCompatActivity {
     private GhostDictionary dictionary;
     private boolean userTurn = false;
     private boolean gameRunning = false;
-    //TODO remove seed after testing
-    private Random random = new Random(12345);
+    private Random random = new Random();
     private String wordFragment;
 
     @Override
