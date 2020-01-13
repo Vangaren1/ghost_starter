@@ -41,7 +41,9 @@ public class GhostActivity extends AppCompatActivity {
     private static final String USER_TURN = "Your turn";
     private GhostDictionary dictionary;
     private boolean userTurn = false;
-    private Random random = new Random();
+    private boolean gameRunning = false;
+    //TODO remove seed after testing
+    private Random random = new Random(12345);
     private String wordFragment;
 
     @Override
@@ -98,6 +100,7 @@ public class GhostActivity extends AppCompatActivity {
         TextView text = (TextView) findViewById(R.id.ghostText);
         text.setText("");
         TextView label = (TextView) findViewById(R.id.gameStatus);
+        gameRunning=true;
         if (userTurn) {
             label.setText(USER_TURN);
         } else {
@@ -109,9 +112,60 @@ public class GhostActivity extends AppCompatActivity {
 
     private void computerTurn() {
         TextView label = (TextView) findViewById(R.id.gameStatus);
+        TextView ghostText = (TextView)findViewById(R.id.ghostText);
         // Do computer turn stuff then make it the user's turn again
+        Log.d("compTurn", "It's the PC's turn");
+
+        // check if the wordFragment is a word, if it is, declare victory for the PC!
+        if(dictionary.isWord(wordFragment))
+        {
+            gameRunning=false;
+            label.setText("PC WINS! You made a word");
+        }
+        else
+        {
+            String possible = dictionary.getAnyWordStartingWith(wordFragment);
+            if(possible==null)
+            {
+                Log.d("possibleWord", "there is no possible word");
+                label.setText("No word, PC WINS!");
+                gameRunning=false;
+            }
+            else
+            {
+                // if there is a word that can be built from that fragment, place the next
+                // letter onto the fragment, and let the user go next
+                Log.d("possibleWord", possible);
+
+                int len = wordFragment.length();
+                wordFragment = possible.substring(0,len+1);
+                ghostText.setText(wordFragment);
+            }
+        }
+
         userTurn = true;
-        label.setText(USER_TURN);
+       // label.setText(USER_TURN);
+    }
+
+    public boolean challenge(View view)
+    {
+        if(gameRunning) {
+            Log.d("challengeFunction", "challenging word");
+            TextView label = (TextView) findViewById(R.id.gameStatus);
+            TextView ghostText = (TextView) findViewById(R.id.ghostText);
+            // check if the word fragment is a word,
+            if (dictionary.isWord(wordFragment) && wordFragment.length() > 3) {
+                label.setText("It IS a word, You WIN!");
+            } else {
+                String possible = dictionary.getAnyWordStartingWith(wordFragment);
+                if (possible != null) {
+                    label.setText("No possible words, You WIN!");
+                } else {
+                    label.setText("PC Wins! Prefix for the word: " + possible);
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -131,33 +185,47 @@ public class GhostActivity extends AppCompatActivity {
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         String lowercase = "abcdefghijklmnopqrstuvwxyz";
         char[] lowerA = lowercase.toCharArray();
-        TextView label = (TextView)findViewById(R.id.gameStatus);;
+        TextView label = (TextView)findViewById(R.id.gameStatus);
         TextView ghostText = (TextView)findViewById(R.id.ghostText);
 
         char pressed = event.getMatch(lowerA);
         // if the key that the user pressed is not a letter, skip over this if statement
 
-        if(lowercase.contains(Character.toString(pressed)))
-        {
-            // add the letter to the word fragment
-            wordFragment += Character.toString(pressed);
+        //make sure the user can't play on the PC's turn
+        if(userTurn && gameRunning) {
+            if (lowercase.contains(Character.toString(pressed))) {
+                // add the letter to the word fragment
+                wordFragment += Character.toString(pressed);
 
-            ghostText.setText(wordFragment);
+                ghostText.setText(wordFragment);
 
-            if(dictionary.isWord(wordFragment))
-            {
-                label.setText("VALID WORD");
+//                if (!wordBuilt()) {
+                    computerTurn();
+//                }
             }
-            else
-            {
-                label.setText("INVALID WORD");
-            }
-
+            Log.d("onKeyUp1", "eventGetChars: " + pressed);
+            Log.d("onKeyUp2", "wordfrag: " + wordFragment);
+            Log.d("onKeyUp2", "isWord: " + Boolean.toString(dictionary.isWord(wordFragment)));
         }
-        Log.d("onKeyUp1", "eventGetChars: "+pressed);
-        Log.d("onKeyUp2", "wordfrag: "+wordFragment);
-        Log.d("onKeyUp2", "isWord: "+Boolean.toString(dictionary.isWord(wordFragment)));
+        if(gameRunning)
+            Log.d("gameRunning", "game is running");
+
         return super.onKeyUp(keyCode, event);
+    }
+
+    public boolean wordBuilt()
+    {
+        TextView label = (TextView)findViewById(R.id.gameStatus);
+        boolean exists = dictionary.isWord(wordFragment);
+        if(dictionary.isWord(wordFragment))
+        {
+            label.setText("word valid");
+        }
+        else
+        {
+            label.setText("not a word");
+        }
+        return exists;
     }
 
     public boolean isChar(String testWord)

@@ -50,6 +50,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="57dp"
         android:layout_marginTop="200dp"
+        android:onClick="challenge"
         android:text="Challenge" />
 
     <Button

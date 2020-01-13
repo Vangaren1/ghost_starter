@@ -19,13 +19,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SimpleDictionary implements GhostDictionary {
+    Random rand;
     private ArrayList<String> words;
 
     public SimpleDictionary(InputStream wordListStream) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(wordListStream));
+        rand = new Random();
         words = new ArrayList<>();
         String line = null;
         while((line = in.readLine()) != null) {
@@ -42,7 +46,36 @@ public class SimpleDictionary implements GhostDictionary {
 
     @Override
     public String getAnyWordStartingWith(String prefix) {
-        return null;
+        // word must be at least 1 character longer than the prefix
+
+        int plen = prefix.length();
+        int wlen = words.size();
+        // if prefix is empty, return a random word from the dictionary
+        if(plen == 0)
+        {
+            return words.get(rand.nextInt(wlen));
+        }
+        // if prefix is not empty, then find a random word starting with that prefix
+        // first: add all words containing that prefix to an arraylist, then randomly select one
+        String tmpString;
+        ArrayList<String> prewords = new ArrayList<>();
+        for(int i =0; i< wlen; i++)
+        {
+            tmpString = words.get(i);
+            if(tmpString.length()>plen)
+            {
+                if(prefix.compareTo(tmpString.substring(0,plen))==0)
+                    prewords.add(tmpString);
+            }
+        }
+        // if prewords is empty, there are no words that contain the prefix, then return null
+        // otherwise return a random word from that list.
+        if(prewords.size()==0)
+            return null;
+        else
+        {
+            return prewords.get(rand.nextInt(prewords.size()));
+        }
     }
 
     @Override
