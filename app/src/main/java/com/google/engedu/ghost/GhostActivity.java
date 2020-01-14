@@ -96,6 +96,7 @@ public class GhostActivity extends AppCompatActivity {
     public boolean onStart(View view) {
         wordFragment="";
         userTurn = random.nextBoolean();
+        dictionary.whoFirst(userTurn);
         TextView text = (TextView) findViewById(R.id.ghostText);
         text.setText("");
         TextView label = (TextView) findViewById(R.id.gameStatus);
@@ -123,7 +124,8 @@ public class GhostActivity extends AppCompatActivity {
         }
         else
         {
-            String possible = dictionary.getAnyWordStartingWith(wordFragment);
+            //String possible = dictionary.getAnyWordStartingWith(wordFragment);
+            String possible = dictionary.getGoodWordStartingWith(wordFragment);
             if(possible==null)
             {
                 Log.d("possibleWord", "there is no possible word");
@@ -155,6 +157,7 @@ public class GhostActivity extends AppCompatActivity {
             // check if the word fragment is a word,
             if (dictionary.isWord(wordFragment) && wordFragment.length() > 3) {
                 label.setText("It IS a word, You WIN!");
+                gameRunning=false;
             } else {
                 String possible = dictionary.getAnyWordStartingWith(wordFragment);
                 if (possible != null) {

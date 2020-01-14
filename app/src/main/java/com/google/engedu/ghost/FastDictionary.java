@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 public class FastDictionary implements GhostDictionary {
 
     private TrieNode root;
+    private boolean UserFirst;
 
     public FastDictionary(InputStream wordListStream) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(wordListStream));
@@ -34,6 +35,11 @@ public class FastDictionary implements GhostDictionary {
             if (word.length() >= MIN_WORD_LENGTH)
                 root.add(line.trim());
         }
+    }
+    @Override
+    public void whoFirst(boolean choice)
+    {
+        this.UserFirst = choice;
     }
     @Override
     public boolean isWord(String word) {

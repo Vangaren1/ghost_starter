@@ -27,4 +27,5 @@ public interface GhostDictionary {
     boolean isWord(String word);
     String getAnyWordStartingWith(String prefix);
     String getGoodWordStartingWith(String prefix);
+    void whoFirst(boolean choice);
 }
